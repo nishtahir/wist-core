@@ -1,9 +1,4 @@
-#include <iostream>
-#include "antlr4-runtime.h"
-#include "BrightScriptLexer.h"
-#include "BrightScriptParser.h"
-#include "BaseErrorListener.h"
-#include "parser/BrightScriptBaseListener.h"
+#include "BrightscriptEventGenerator.h"
 
 using namespace std;
 using namespace antlr4;
@@ -11,12 +6,14 @@ using namespace antlr4;
 class BrightscriptEventGenerator : public BrightScriptBaseListener
 {
   public:
-    virtual void enterStartRule(BrightScriptParser::StartRuleContext * /*ctx*/) override
+    virtual void enterFunctionDeclaration(BrightScriptParser::FunctionDeclarationContext *ctx) override
     {
+        checkDeclaration(ctx->untypedIdentifier());
     }
 
-    virtual void enterFunctionDeclaration(BrightScriptParser::FunctionDeclarationContext * /*ctx*/) override
+    virtual void enterSubDeclaration(BrightScriptParser::SubDeclarationContext *ctx) override
     {
+        checkDeclaration(ctx->untypedIdentifier());
     }
 
   private:
@@ -25,14 +22,14 @@ class BrightscriptEventGenerator : public BrightScriptBaseListener
     bool isFunction(ParserRuleContext *context)
     {
         return isSub(context) ||
-               context->getRuleIndex == BrightScriptParser::RuleAnonymousFunctionDeclaration ||
-               context->getRuleIndex == BrightScriptParser::RuleFunctionDeclaration;
+               context->getRuleIndex() == BrightScriptParser::RuleAnonymousFunctionDeclaration ||
+               context->getRuleIndex() == BrightScriptParser::RuleFunctionDeclaration;
     }
 
     bool isSub(ParserRuleContext *context)
     {
-        return context->getRuleIndex == BrightScriptParser::RuleAnonymousSubDeclaration ||
-               context->getRuleIndex == BrightScriptParser::RuleSubDeclaration;
+        return context->getRuleIndex() == BrightScriptParser::RuleAnonymousSubDeclaration ||
+               context->getRuleIndex() == BrightScriptParser::RuleSubDeclaration;
     }
 
     bool functionNameExists(string nameToCheck)
@@ -49,9 +46,10 @@ class BrightscriptEventGenerator : public BrightScriptBaseListener
 
     void checkDeclaration(BrightScriptParser::UntypedIdentifierContext *context)
     {
-        auto name = context->getText;
+        auto name = context->getText();
         if (functionNameExists(name))
         {
+
             // notify error listener
         }
         else

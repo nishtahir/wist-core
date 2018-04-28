@@ -1,35 +1,14 @@
-#include <iostream>
 #include "antlr4-runtime.h"
 #include "BrightScriptLexer.h"
-#include "BrightScriptParser.h"
-#include "BaseErrorListener.h"
+#include "BrightscriptEventGenerator.h"
+#include "SyntaxErrorListener.h"
+
 #include <emscripten/emscripten.h>
 #include <emscripten/bind.h>
 
 using namespace antlr4;
 using namespace std;
 using namespace emscripten;
-
-struct SyntaxError
-{
-    string message;
-    uint32_t line;
-    uint32_t column;
-};
-
-class SyntaxErrorListener : public BaseErrorListener
-{
-  public:
-    vector<SyntaxError> *errors;
-
-    SyntaxErrorListener(vector<SyntaxError> *error_list) : errors(error_list) {}
-
-    virtual void syntaxError(Recognizer *recognizer, Token *offendingSymbol, size_t line,
-                             size_t charPositionInLine, const std::string &msg, std::exception_ptr e)
-    {
-        errors->push_back(SyntaxError{msg, line, charPositionInLine});
-    }
-};
 
 EMSCRIPTEN_KEEPALIVE vector<SyntaxError> parse(string source)
 {
