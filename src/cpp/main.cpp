@@ -1,8 +1,7 @@
 #include "antlr4-runtime.h"
 #include "BrightScriptLexer.h"
-#include "BrightscriptEventGenerator.h"
+#include "BrightscriptEventListener.h"
 #include "SyntaxErrorListener.h"
-
 #include <emscripten/emscripten.h>
 #include <emscripten/bind.h>
 
@@ -26,8 +25,11 @@ EMSCRIPTEN_KEEPALIVE vector<SyntaxError> parse(string source)
     BrightScriptParser parser(&tokens);
     parser.removeErrorListeners();
     parser.addErrorListener(&errorListener);
-    parser.startRule();
+    
+    tree::ParseTree *tree = parser.startRule();
 
+    BrightscriptEventListener listener;
+    tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
     return errors;
 }
 
