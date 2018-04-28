@@ -28,7 +28,7 @@ EMSCRIPTEN_KEEPALIVE vector<SyntaxError> parse(string source)
     
     tree::ParseTree *tree = parser.startRule();
 
-    BrightscriptEventListener listener;
+    BrightscriptEventListener listener(&parser);
     tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
     return errors;
 }
