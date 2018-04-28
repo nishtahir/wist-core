@@ -1,0 +1,22 @@
+apply plugin: "antlr"
+
+repositories {
+    jcenter()
+}
+
+sourceSets {
+    main {
+        antlr {
+            srcDirs = ['grammar']
+        }
+    }
+}
+
+generateGrammarSource {
+    outputDirectory = file("src/cpp/parser") 
+    arguments += ["-visitor", "-Dlanguage=Cpp", "-long-messages"]
+}
+
+dependencies {
+    antlr("org.antlr:antlr4:4.7")
+}
