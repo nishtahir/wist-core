@@ -8,17 +8,16 @@ using namespace antlr4;
 
 class BrightscriptEventListener : public BrightScriptBaseListener
 {
-  public:
-    BrightscriptEventListener(BrightScriptParser *parser);
-    virtual void enterFunctionDeclaration(BrightScriptParser::FunctionDeclarationContext *ctx) override;
-    virtual void enterSubDeclaration(BrightScriptParser::SubDeclarationContext *ctx) override;
+public:
+  BrightscriptEventListener(BrightScriptParser *parser);
+  virtual void enterFunctionDeclaration(BrightScriptParser::FunctionDeclarationContext *ctx) override;
+  virtual void enterSubDeclaration(BrightScriptParser::SubDeclarationContext *ctx) override;
+  virtual void exitReturnStatement(BrightScriptParser::ReturnStatementContext * ctx) override;
 
-  private:
-    BrightScriptParser *parser;
-    vector<string> functionNames = {};
-    bool isFunction(ParserRuleContext *context);
-    bool isSub(ParserRuleContext *context);
-    bool functionNameExists(string nameToCheck);
-    void checkDeclaration(BrightScriptParser::UntypedIdentifierContext *context);
+private:
+  BrightScriptParser *parser;
+  vector<string> functionNames = {};
+  bool functionNameExists(string nameToCheck);
+  void checkDeclaration(BrightScriptParser::UntypedIdentifierContext *context);
 };
 #endif

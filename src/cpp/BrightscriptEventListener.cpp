@@ -16,6 +16,19 @@ static inline std::string string_upper(const std::string &str)
     return strcopy;
 }
 
+bool isSub(ParserRuleContext *context)
+{
+    return context->getRuleIndex() == BrightScriptParser::RuleAnonymousSubDeclaration ||
+           context->getRuleIndex() == BrightScriptParser::RuleSubDeclaration;
+}
+
+bool isFunction(ParserRuleContext *context)
+{
+    return isSub(context) ||
+           context->getRuleIndex() == BrightScriptParser::RuleAnonymousFunctionDeclaration ||
+           context->getRuleIndex() == BrightScriptParser::RuleFunctionDeclaration;
+}
+
 BrightscriptEventListener::BrightscriptEventListener(BrightScriptParser *_parser) : parser(_parser) {}
 
 void BrightscriptEventListener::enterFunctionDeclaration(BrightScriptParser::FunctionDeclarationContext *ctx)
@@ -28,17 +41,23 @@ void BrightscriptEventListener::enterSubDeclaration(BrightScriptParser::SubDecla
     checkDeclaration(ctx->untypedIdentifier());
 }
 
-bool BrightscriptEventListener::isFunction(ParserRuleContext *context)
+ParserRuleContext *getParentFunctionContext(ParserRuleContext *ctx)
 {
-    return isSub(context) ||
-           context->getRuleIndex() == BrightScriptParser::RuleAnonymousFunctionDeclaration ||
-           context->getRuleIndex() == BrightScriptParser::RuleFunctionDeclaration;
+    if (ParserRuleContext *parent = dynamic_cast<ParserRuleContext *>(ctx->parent))
+    {
+        return isFunction(parent) ? parent : getParentFunctionContext(parent);
+    }
+    return nullptr;
 }
 
-bool BrightscriptEventListener::isSub(ParserRuleContext *context)
+void BrightscriptEventListener::exitReturnStatement(BrightScriptParser::ReturnStatementContext *ctx)
 {
-    return context->getRuleIndex() == BrightScriptParser::RuleAnonymousSubDeclaration ||
-           context->getRuleIndex() == BrightScriptParser::RuleSubDeclaration;
+    auto functionParent = getParentFunctionContext(ctx);
+    if (functionParent == nullptr)
+    {
+        return;
+    }
+    // TODO - check return type
 }
 
 bool BrightscriptEventListener::functionNameExists(string nameToCheck)
