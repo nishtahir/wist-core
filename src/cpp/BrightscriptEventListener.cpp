@@ -57,7 +57,35 @@ void BrightscriptEventListener::exitReturnStatement(BrightScriptParser::ReturnSt
     {
         return;
     }
-    // TODO - check return type
+
+    // if we can't figure out the type, it's
+    // probably dynamic
+    // TODO - Replace string constants with enums for performance
+    string type = "DYNAMIC";
+    if (isSub(functionParent))
+    {
+        type = "VOID";
+    }
+    else
+    {
+        for (auto child : functionParent->children)
+        {
+            if (BrightScriptParser::BaseTypeContext *childCtx = dynamic_cast<BrightScriptParser::BaseTypeContext *>(child))
+            {
+                type = string_upper(childCtx->getText());
+            }
+        }
+    }
+
+    bool hasExpression = ctx->children.size() > 1;
+    if (type == "VOID" && hasExpression)
+    {
+        parser->notifyErrorListeners(ctx->start, "Unexpected return value for function with return type " + type, nullptr);
+    }
+    else if (type != "VOID" && !hasExpression)
+    {
+        parser->notifyErrorListeners(ctx->start, "Expected return value for function with return type " + type, nullptr);
+    }
 }
 
 bool BrightscriptEventListener::functionNameExists(string nameToCheck)

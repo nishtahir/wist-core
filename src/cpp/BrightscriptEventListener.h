@@ -12,7 +12,7 @@ public:
   BrightscriptEventListener(BrightScriptParser *parser);
   virtual void enterFunctionDeclaration(BrightScriptParser::FunctionDeclarationContext *ctx) override;
   virtual void enterSubDeclaration(BrightScriptParser::SubDeclarationContext *ctx) override;
-  virtual void exitReturnStatement(BrightScriptParser::ReturnStatementContext * ctx) override;
+  virtual void exitReturnStatement(BrightScriptParser::ReturnStatementContext *ctx) override;
 
 private:
   BrightScriptParser *parser;
