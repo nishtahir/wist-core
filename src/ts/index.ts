@@ -1,7 +1,20 @@
 import * as wist from "../../dist/libwist";
-import * as process from "process"
+import * as process from "process";
+import EventEmitter from "events";
+
+class BrightscriptEventGenerator {
+
+    constructor() { }
+
+    enterFunctionDeclaration(context) {
+        console.log("functionDeclaration:enter")
+    }
+}
+
 wist['onRuntimeInitialized'] = () => {
-    const test = (wist as any).parse(`
+    const event = new BrightscriptEventGenerator();
+
+    const test = (wist as any).parseWithEmitter(`
     ' This is a sample file containing syntax that compiles properly
 
     #const debug = true
@@ -76,6 +89,6 @@ wist['onRuntimeInitialized'] = () => {
     
         return
     end function    
-    `);
+    `, event);
     console.log(test.get(0))
 };

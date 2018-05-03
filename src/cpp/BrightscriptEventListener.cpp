@@ -1,6 +1,7 @@
 #include "BrightscriptEventListener.h"
 
 using namespace std;
+using namespace emscripten;
 using namespace antlr4;
 
 static inline char string_toupper_functional(char c)
@@ -31,8 +32,18 @@ bool isFunction(ParserRuleContext *context)
 
 BrightscriptEventListener::BrightscriptEventListener(BrightScriptParser *_parser) : parser(_parser) {}
 
+BrightscriptEventListener::BrightscriptEventListener(BrightScriptParser *_parser, emscripten::val *_emitter)
+{
+    parser = _parser;
+    emitter = _emitter;
+}
+
 void BrightscriptEventListener::enterFunctionDeclaration(BrightScriptParser::FunctionDeclarationContext *ctx)
 {
+    if (emitter != nullptr && !emitter->isNull() && !emitter->IsUndefined())
+    {
+        emitter->call<val>("enterFunctionDeclaration");
+    }
     checkDeclaration(ctx->untypedIdentifier());
 }
 
