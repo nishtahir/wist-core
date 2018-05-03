@@ -1,4 +1,5 @@
 #include "BrightscriptEventListener.h"
+#include "Node.h"
 
 using namespace std;
 using namespace emscripten;
@@ -23,6 +24,21 @@ bool isSub(ParserRuleContext *context)
            context->getRuleIndex() == BrightScriptParser::RuleSubDeclaration;
 }
 
+TreeNode buildTreeFromContext(ParserRuleContext *context, BrightScriptParser *parser)
+{
+    vector<TreeNode> children = {};
+    for (auto child : context->children)
+    {
+        if (ParserRuleContext *childContext = dynamic_cast<ParserRuleContext *>(child))
+        {
+            children.push_back(buildTreeFromContext(childContext, parser));
+        }
+    }
+    return TreeNode{
+        Node{parser->getRuleNames()[context->getRuleIndex()], context->getText()},
+        children};
+}
+
 bool isFunction(ParserRuleContext *context)
 {
     return isSub(context) ||
@@ -40,9 +56,10 @@ BrightscriptEventListener::BrightscriptEventListener(BrightScriptParser *_parser
 
 void BrightscriptEventListener::enterFunctionDeclaration(BrightScriptParser::FunctionDeclarationContext *ctx)
 {
-    if (emitter != nullptr && !emitter->isNull() && !emitter->IsUndefined())
+    if (emitter != nullptr && !emitter->isNull() && !emitter->isUndefined())
     {
-        emitter->call<val>("enterFunctionDeclaration");
+        TreeNode tree = buildTreeFromContext(ctx, parser);
+        emitter->call<val>("enterFunctionDeclaration", tree);
     }
     checkDeclaration(ctx->untypedIdentifier());
 }

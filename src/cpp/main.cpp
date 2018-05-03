@@ -61,7 +61,8 @@ EMSCRIPTEN_BINDINGS(wist_module)
         .field("column", &SyntaxError::column);
 
     emscripten::value_object<Node>("Node")
-        .field("ruleName", &Node::ruleName);
+        .field("ruleName", &Node::ruleName)
+        .field("text", &Node::text);
 
     emscripten::value_object<TreeNode>("TreeNode")
         .field("node", &TreeNode::node)

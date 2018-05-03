@@ -7,6 +7,7 @@ using namespace std;
 struct Node
 {
     string ruleName;
+    string text;
 };
 
 struct TreeNode

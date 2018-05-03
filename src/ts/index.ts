@@ -7,7 +7,7 @@ class BrightscriptEventGenerator {
     constructor() { }
 
     enterFunctionDeclaration(context) {
-        console.log("functionDeclaration:enter")
+        console.log(context);
     }
 }
 
