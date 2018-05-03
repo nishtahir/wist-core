@@ -7,9 +7,12 @@ using namespace std;
 struct Node
 {
     string ruleName;
-    string text;
-    Node *parent;
-    vector<Node> *children;
+};
+
+struct TreeNode
+{
+    Node node;
+    vector<TreeNode> children;
 };
 
 #endif

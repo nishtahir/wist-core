@@ -5,14 +5,14 @@ using namespace antlr4;
 
 static inline char string_toupper_functional(char c)
 {
-    return std::toupper(c);
+    return toupper(c);
 }
 
-static inline std::string string_upper(const std::string &str)
+static inline string string_upper(const string &str)
 {
     //TODO - replace strcopy
-    std::string strcopy(str.size(), 0);
-    std::transform(str.begin(), str.end(), strcopy.begin(), string_toupper_functional);
+    string strcopy(str.size(), 0);
+    transform(str.begin(), str.end(), strcopy.begin(), string_toupper_functional);
     return strcopy;
 }
 
