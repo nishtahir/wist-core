@@ -3,6 +3,7 @@
 #include "SyntaxErrorListener.h"
 #include "Node.h"
 #include "BrightscriptEventListener.h"
+#include "BrightscriptFormatListener.h"
 
 #include <emscripten/emscripten.h>
 #include <emscripten/bind.h>
@@ -50,10 +51,29 @@ int main()
     return 0;
 }
 
+EMSCRIPTEN_KEEPALIVE string format(string source)
+{
+    ANTLRInputStream input(source);
+    BrightScriptLexer lexer(&input);
+    lexer.removeErrorListeners();
+
+    CommonTokenStream tokens(&lexer);
+
+    BrightScriptParser parser(&tokens);
+    parser.removeErrorListeners();
+
+    tree::ParseTree *tree = parser.startRule();
+    BrightscriptFormatListener listener(&tokens);
+    tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
+
+    return listener.getFormattedSource();
+}
+
 EMSCRIPTEN_BINDINGS(wist_module)
 {
     emscripten::function("parse", &parse);
     emscripten::function("parseWithEmitter", &parseWithEmitter);
+    emscripten::function("format", &format);
 
     emscripten::value_object<SyntaxError>("SyntaxError")
         .field("message", &SyntaxError::message)

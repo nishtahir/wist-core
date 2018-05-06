@@ -14,7 +14,7 @@ class BrightscriptEventGenerator {
 wist['onRuntimeInitialized'] = () => {
     const event = new BrightscriptEventGenerator();
 
-    const test = (wist as any).parseWithEmitter(`
+    const test = (wist as any).format(`
     ' This is a sample file containing syntax that compiles properly
 
     #const debug = true
@@ -89,6 +89,6 @@ wist['onRuntimeInitialized'] = () => {
     
         return
     end function    
-    `, event);
-    console.log(test.get(0))
+    `);
+    console.log(test)
 };
