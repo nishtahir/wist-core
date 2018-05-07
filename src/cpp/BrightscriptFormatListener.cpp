@@ -1,4 +1,5 @@
 #include "BrightscriptFormatListener.h"
+#include "trim.h"
 
 using namespace std;
 using namespace antlr4;
@@ -15,8 +16,11 @@ string buildIndent(int indent)
 
 void BrightscriptFormatListener::writeCarriageReturn()
 {
-  source.append("\n");
-  newLine = true;
+  if (previousToken != "\n")
+  {
+    source.append("\n");
+    previousToken = "\n";
+  }
 }
 
 string noSpaceBeforeTokens[] = {".", ",", "(", ")"};
@@ -32,7 +36,7 @@ bool nextTokenShouldHaveSpaceBefore(string token)
   return true;
 }
 
-string noSpaceAfterTokens[] = {".", "}", "("};
+string noSpaceAfterTokens[] = {".", "}", "(", ":"};
 bool previousTokenShouldHaveSpace(string token)
 {
   for (string character : noSpaceAfterTokens)
@@ -47,11 +51,11 @@ bool previousTokenShouldHaveSpace(string token)
 
 void BrightscriptFormatListener::writeNode(tree::TerminalNode *terminalNode)
 {
-  string node = terminalNode->getText();
-  
-  if (previousToken == "\n")
+  string text = terminalNode->getText();
+  string node = trim(text);
+  if (node == "")
   {
-    newLine = true;
+    return;
   }
 
   if (newLine == false && previousTokenShouldHaveSpace(previousToken) && nextTokenShouldHaveSpaceBefore(node))
@@ -63,7 +67,8 @@ void BrightscriptFormatListener::writeNode(tree::TerminalNode *terminalNode)
   {
     source.append(buildIndent(currentIndent));
   }
-  source.append(node);
+
+  source.append(trim(node));
   if (newLine == true)
   {
     newLine = false;
@@ -81,23 +86,32 @@ BrightscriptFormatListener::BrightscriptFormatListener(CommonTokenStream *_token
 
 void BrightscriptFormatListener::enterEveryRule(ParserRuleContext *ctx)
 {
-  if (ctx->getRuleIndex() == BrightScriptParser::RuleBlock)
+  if (ctx->getRuleIndex() == BrightScriptParser::RuleEndOfLine)
   {
-    currentIndent++;
     writeCarriageReturn();
+    newLine = true;
+  }
+  else if (ctx->getRuleIndex() == BrightScriptParser::RuleBlock)
+  {
+    newLine = true;
+    currentIndent++;
   }
   currentContext = ctx;
 }
 
 void BrightscriptFormatListener::exitEveryRule(ParserRuleContext *ctx)
 {
-  if (ctx->getRuleIndex() == BrightScriptParser::RuleBlock)
+  if (ctx->getRuleIndex() == BrightScriptParser::RuleEndOfLine)
+  {
+    newLine = true;
+    writeCarriageReturn();
+  }
+  else if (ctx->getRuleIndex() == BrightScriptParser::RuleBlock)
   {
     if (currentIndent > 0)
     {
       currentIndent--;
     }
-    writeCarriageReturn();
   }
 }
 

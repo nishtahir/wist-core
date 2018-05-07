@@ -1,87 +1,41 @@
 
-
-
- #const debug = true 
-
-
-
-
-sub DefaultMain() 
-
-    #if debug = true 
-
-        print "debug mode enabled" 
-
-    #else 
-
-        print "debug mode disabled" 
-
-    #end if 
-    
-    print "in showChannelSGScreen" 
-    
-    
-    screen = CreateObject("roSGScreen") 
-    m.port = CreateObject("roMessagePort") 
-    screen.setMessagePort(m.port) 
-    
-    
-    scene = screen.CreateScene("SampleProject") 
-    screen.show() 
-    
-    stop 
-    
-    ? "some thing" ; "other thing" 
-    
-    a = [ "foo","bar","baz" ] 
-    
-    b = [ 
-    "foo" 
-    "bar" 
-    "baz" 
-    ] 
-    
-    c = { 
-    "foo" : 1,
-    "bar" : 2,
-    "baz" : 3 
-    }
-    
-    c = { 
-    "foo" : 1 
-    "bar" : 2 
-    "baz" : 3 
-    }
-    
-    
-    Run("pkg:/source/Missing.brs") 
-    
-    Eval("d = 1") 
-    
-    while(true) 
-
-        msg = wait(0,m.port) 
-        msgType = type(msg) 
-        if msgType = "roSGScreenEvent" 
-
-            if msg.isScreenClosed() then return 
-
-        end if 
-
-    end while 
-    
-    
-    end 
-    
-
-end sub 
-
-function SomeFunc() as void 
-
-    a = "foo" 
-    b = "bar" 
-    
-    return 
-
-end function 
+#const debug = true
+sub DefaultMain()
+    #if debug = true
+        print "debug mode enabled"
+    #else
+        print "debug mode disabled"
+    #end if
+    print "in showChannelSGScreen"
+    screen = CreateObject("roSGScreen")
+    m.port = CreateObject("roMessagePort")
+    screen.setMessagePort(m.port)
+    scene = screen.CreateScene("SampleProject")
+    screen.show()
+    stop
+    ? "some thing" ; "other thing"
+    a = [ "foo", "bar", "baz" ]
+    b = [ "foo"
+    "bar"
+    "baz" ]
+    c = { "foo" :1, "bar" :2, "baz" :3 }
+    c = { "foo" :1
+    "bar" :2
+    "baz" :3 }
+    Run("pkg:/source/Missing.brs")
+    Eval("d = 1")
+    while(true)
+        msg = wait(0, m.port)
+        msgType = type(msg)
+        if msgType = "roSGScreenEvent"
+            if msg.isScreenClosed() then return
+        end if
+    end while
+    end
+end sub
+function SomeFunc() as void
+    a = "foo"
+    b = "bar"
+    return
+end function
 <EOF>
