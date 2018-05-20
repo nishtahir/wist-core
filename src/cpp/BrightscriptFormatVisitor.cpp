@@ -54,7 +54,7 @@ Any BrightscriptFormatVisitor::visitAssociativeArrayInitializer(BrightScriptPars
     auto current = ctx->children[i];
     auto next = ctx->children[i + 1];
 
-    if (TerminalNode *node = dynamic_cast<TerminalNode *>(current))
+    if (auto *node = dynamic_cast<TerminalNode *>(current))
     {
       if (node->getSymbol()->getType() == BrightScriptParser::OPEN_BRACE)
       {
@@ -68,7 +68,7 @@ Any BrightscriptFormatVisitor::visitAssociativeArrayInitializer(BrightScriptPars
         writeNode(node);
       }
     }
-    else if (BrightScriptParser::EndOfLineContext *endOfLineCtx = dynamic_cast<BrightScriptParser::EndOfLineContext *>(current))
+    else if (auto *endOfLineCtx = dynamic_cast<BrightScriptParser::EndOfLineContext *>(current))
     {
       visitChildren(endOfLineCtx);
     }
@@ -101,6 +101,53 @@ Any BrightscriptFormatVisitor::visitAssociativeArrayInitializer(BrightScriptPars
 
 Any BrightscriptFormatVisitor::visitArrayInitializer(BrightScriptParser::ArrayInitializerContext *ctx)
 {
+    for (int i = 0; i < ctx->children.size() - 1; i++)
+  {
+    auto current = ctx->children[i];
+    auto next = ctx->children[i + 1];
+
+    if (auto *node = dynamic_cast<TerminalNode *>(current))
+    {
+      if (node->getSymbol()->getType() == BrightScriptParser::OPEN_BRACKET)
+      {
+        currentIndent++;
+        writeNode(node);
+        writeCarriageReturn();
+      }
+      else if (node->getSymbol()->getType() == BrightScriptParser::CLOSE_BRACKET)
+      {
+        currentIndent--;
+        writeNode(node);
+      }
+    }
+    else if (auto *endOfLineCtx = dynamic_cast<BrightScriptParser::EndOfLineContext *>(current))
+    {
+      visitChildren(endOfLineCtx);
+    }
+    else
+    {
+      visitChildren(current);
+      // Write the next token if it's a comma
+      if (TerminalNode *node = dynamic_cast<TerminalNode *>(next))
+      {
+        if (node->getSymbol()->getType() == BrightScriptParser::COMMA)
+        {
+          writeNode(node);
+        }
+      }
+      writeCarriageReturn();
+    }
+
+    // Write next node if it's a closing brace
+    if (TerminalNode *node = dynamic_cast<TerminalNode *>(next))
+    {
+      if (node->getSymbol()->getType() == BrightScriptParser::CLOSE_BRACKET)
+      {
+        currentIndent--;
+        writeNode(node);
+      }
+    }
+  }
   return nullptr;
 }
 
